@@ -1,0 +1,40 @@
+#  аждый хищник выбирает по жертве, но жертвы ничего не вид€т и не могут убежать
+#
+# Game description format:
+# First line:
+#	rows colums
+# Objects types: 
+#	Block = 0
+#	Predator = 1
+#	Victim = 2
+#  	SoloWatchingVictim = 3
+#  	GroupWatchingVictim = 4
+#  	OptimisticWatchingPredator = 5
+#  	RealisticWatchingPredator = 6
+# Block: 
+#  	Type=0 posX posY 
+# Predator:
+#	Type=1 posX posY initialStamina
+#	initialStamina - initial stamina stock
+# Victim:
+#  	Type=2 posX posY reproduceSpeed worth
+#  	reproduceSpeed - number of steps when microbe reproduce
+#  	worth - number of healthPoints that preedator gain when eat me
+# SoloWatchingVictim:
+#  	Type=3 posX posY reproduceSpeed worth visionRadius
+# GroupWatchingVictim:
+#  	Type=4 posX posY reproduceSpeed worth visionRadius
+# OptimisticWatchingPredator:
+#  	Type=5 posX posY initialStamina visionRadius
+# RealisticWatchingPredator:
+#  	Type=6 posX posY initialStamina visionRadius
+#
+20 20
+3 1 10 100 10 0
+3 10 1 100 10 0
+3 10 20 100 10 0
+3 20 10 100 10 0
+6 9 10 100 100
+6 10 9 100 100
+6 10 11 100 100
+6 11 10 100 100

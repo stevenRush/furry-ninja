@@ -1,0 +1,36 @@
+# Стратегия кучкования - жертвы объединяются в стадо
+#
+# Game description format:
+# First line:
+#	rows colums
+# Objects types: 
+#	Block = 0
+#	Predator = 1
+#	Victim = 2
+#  	SoloWatchingVictim = 3
+#  	GroupWatchingVictim = 4
+#  	OptimisticWatchingPredator = 5
+#  	RealisticWatchingPredator = 6
+# Block: 
+#  	Type=0 posX posY 
+# Predator:
+#	Type=1 posX posY initialStamina
+#	initialStamina - initial stamina stock
+# Victim:
+#  	Type=2 posX posY reproduceSpeed worth
+#  	reproduceSpeed - number of steps when microbe reproduce
+#  	worth - number of healthPoints that preedator gain when eat me
+# SoloWatchingVictim:
+#  	Type=3 posX posY reproduceSpeed worth visionRadius
+# GroupWatchingVictim:
+#  	Type=4 posX posY reproduceSpeed worth visionRadius
+# OptimisticWatchingPredator:
+#  	Type=5 posX posY initialStamina visionRadius
+# RealisticWatchingPredator:
+#  	Type=6 posX posY initialStamina visionRadius
+#
+10 10
+4 1 1 100 1 100
+4 1 10 100 1 100
+4 10 1 100 1 100
+4 10 10 100 1 100

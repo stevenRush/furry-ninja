@@ -1,0 +1,34 @@
+# Хищник гоняется за жертвой - пример уровня B
+#
+# Game description format:
+# First line:
+#	rows colums
+# Objects types: 
+#	Block = 0
+#	Predator = 1
+#	Victim = 2
+#  	SoloWatchingVictim = 3
+#  	GroupWatchingVictim = 4
+#  	OptimisticWatchingPredator = 5
+#  	RealisticWatchingPredator = 6
+# Block: 
+#  	Type=0 posX posY 
+# Predator:
+#	Type=1 posX posY initialStamina
+#	initialStamina - initial stamina stock
+# Victim:
+#  	Type=2 posX posY reproduceSpeed worth
+#  	reproduceSpeed - number of steps when microbe reproduce
+#  	worth - number of healthPoints that preedator gain when eat me
+# SoloWatchingVictim:
+#  	Type=3 posX posY reproduceSpeed worth visionRadius
+# GroupWatchingVictim:
+#  	Type=4 posX posY reproduceSpeed worth visionRadius
+# OptimisticWatchingPredator:
+#  	Type=5 posX posY initialStamina visionRadius
+# RealisticWatchingPredator:
+#  	Type=6 posX posY initialStamina visionRadius
+#
+10 10
+3 8 3 100 10 100
+5 8 8 100 10 100
