@@ -1,0 +1,1 @@
+Dont forget to change namespace when you will use it in your projects
