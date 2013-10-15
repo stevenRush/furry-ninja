@@ -383,6 +383,18 @@ public:
 	}
 };
 
+void input(size_t & length, std::string & string1, std::string & string2)
+{
+	std::cin >> length;
+	std::cin >> string1;
+	std::cin >> string2;
+}
+
+void output(const std::string & answer)
+{
+	std::cout << answer;
+}
+
 int main()
 {
 	//freopen("C:\\temp\\input.txt", "r", stdin);
@@ -390,14 +402,13 @@ int main()
 	suffix_tree tree;
 	size_t length;
 	std::string string1; 
-	std::string string2;
-	
-	std::cin >> length;
-	std::cin >> string1;
-	std::cin >> string2;
+	std::string string2;	
+	input(length, string1, string2);
+
 	tree.add_string(string1);
 	tree.add_string(string2);
 	std::string lcs = tree.get_lcs(string1.length(), string2.length());
-	std::cout << lcs << std::endl;
+
+	output(lcs);
 	return 0;
 }
