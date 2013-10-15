@@ -385,7 +385,7 @@ public:
 
 void input(size_t & length, std::string & string1, std::string & string2)
 {
-	freopen("C:\\temp\\input.txt", "r", stdin);
+	//freopen("C:\\temp\\input.txt", "r", stdin);
 	std::cin >> length;
 	std::cin >> string1;
 	std::cin >> string2;
