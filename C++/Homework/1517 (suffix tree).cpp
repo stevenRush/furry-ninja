@@ -385,6 +385,7 @@ public:
 
 void input(size_t & length, std::string & string1, std::string & string2)
 {
+	freopen("C:\\temp\\input.txt", "r", stdin);
 	std::cin >> length;
 	std::cin >> string1;
 	std::cin >> string2;
@@ -392,13 +393,11 @@ void input(size_t & length, std::string & string1, std::string & string2)
 
 void output(const std::string & answer)
 {
-	std::cout << answer;
+	std::cout << answer << std::endl;
 }
 
 int main()
 {
-	//freopen("C:\\temp\\input.txt", "r", stdin);
-
 	suffix_tree tree;
 	size_t length;
 	std::string string1; 
