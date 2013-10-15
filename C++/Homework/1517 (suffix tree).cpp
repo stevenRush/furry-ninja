@@ -4,6 +4,9 @@
 #include <utility>
 #include <set>
 #include <vector>
+#include <limits>
+
+const int INF = std::numeric_limits<int>::max();
 
 class suffix_tree
 {
@@ -88,6 +91,14 @@ private:
 				result.depth = -1;
 			}
 			return result;
+		}
+
+		~suffix_tree_node()
+		{
+			for(auto it = edges.begin(); it != edges.end(); ++it)
+			{
+				delete it->second;
+			}
 		}
 	};
 
@@ -179,6 +190,11 @@ private:
 			}
 			return result;
 		}
+
+		~suffix_tree_edge()
+		{
+			delete end_node;
+		}
 	};
 
 	struct suffix_tree_suffix
@@ -252,6 +268,8 @@ private:
 
 	std::string text;
 	suffix_tree_node * root;
+	size_t delimiters_count;
+	suffix_tree_suffix active;
 
 	void add_prefix(suffix_tree_suffix * active, int end_index)
 	{
@@ -284,7 +302,7 @@ private:
 				parent_node = edge->split_edge(active);
 			}
 
-			suffix_tree_edge * new_edge = new suffix_tree_edge(end_index, text.length() -1, parent_node);
+			suffix_tree_edge * new_edge = new suffix_tree_edge(end_index, INF, parent_node);
 			new_edge->insert();
 			update_suffix_link(last_parent_node, parent_node);
 			last_parent_node = parent_node;
@@ -312,20 +330,33 @@ private:
 		}
 	}
 
-public:
-	suffix_tree()
+	void add_delimiter()
 	{
-		root = new suffix_tree_node(NULL, this);
+		delimiters_count += 1;
+		char delimiter = (char) 'Z' + delimiters_count;
+		add_character(delimiter);
+	}
+
+public:
+	suffix_tree() :
+		root(new suffix_tree_node(NULL, this)),
+		active(root, 0, -1)
+	{
 	}
 
 	void add_string(const std::string & string)
 	{
-		text = string;
-		suffix_tree_suffix * active = new suffix_tree_suffix(root, 0, -1);
-		for(size_t index = 0; index < string.length(); ++index)
+		for(auto it = string.begin(); it != string.end(); ++it)
 		{
-			add_prefix(active, index);	
+			add_character(*it);
 		}
+		add_delimiter();
+	}
+
+	void add_character(char character)
+	{
+		text.push_back(character);
+		add_prefix(&active, text.length() - 1);
 	}
 
 	char get_char(size_t index)
@@ -345,16 +376,12 @@ public:
 			return text.substr(result.end_index - result.depth + 1, result.depth);
 		}
 	}
-};
 
-std::string make_big_string(const std::string & string1, const std::string & string2)
-{
-	std::string result = string1;
-	result += (char)('Z' + 1);
-	result += string2;
-	result += (char)('Z' + 2);
-	return result;
-}
+	~suffix_tree()
+	{
+		delete root;
+	}
+};
 
 int main()
 {
@@ -368,8 +395,8 @@ int main()
 	std::cin >> length;
 	std::cin >> string1;
 	std::cin >> string2;
-	std::string big_string = make_big_string(string1, string2);
-	tree.add_string(big_string);
+	tree.add_string(string1);
+	tree.add_string(string2);
 	std::string lcs = tree.get_lcs(string1.length(), string2.length());
 	std::cout << lcs << std::endl;
 	return 0;
