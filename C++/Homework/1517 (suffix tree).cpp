@@ -33,6 +33,7 @@ private:
 	struct suffix_tree_node
 	{
 		suffix_tree_node * suffix_link;
+		suffix_tree_node * next_to_delete;
 		suffix_tree * tree;
 		std::map<char, suffix_tree_edge *> edges;
 
@@ -92,14 +93,6 @@ private:
 			}
 			return result;
 		}
-
-		~suffix_tree_node()
-		{
-			for(auto it = edges.begin(); it != edges.end(); ++it)
-			{
-				delete it->second;
-			}
-		}
 	};
 
 	struct suffix_tree_edge
@@ -108,6 +101,7 @@ private:
 		int end_index;
 		suffix_tree_node * start_node;
 		suffix_tree_node * end_node;
+		suffix_tree_edge * next_to_delete;
 
 		suffix_tree_edge(int begin, int end, suffix_tree_node * start)
 		{
@@ -115,12 +109,14 @@ private:
 			end_index = end;
 			start_node = start;
 			end_node = new suffix_tree_node(NULL, start->tree);
+			get_tree()->update_last_node(end_node);
 		}
 
 		suffix_tree_node * split_edge(suffix_tree_suffix * suffix)
 		{
 			remove();
 			suffix_tree_edge * new_edge = new suffix_tree_edge(begin_index, begin_index + suffix->get_span(), suffix->origin_node);
+			get_tree()->update_last_edge(new_edge);
 			new_edge->insert();
 			new_edge->end_node->suffix_link = suffix->origin_node;
 			begin_index += suffix->get_span() + 1;
@@ -189,11 +185,6 @@ private:
 				result.depth = -1;
 			}
 			return result;
-		}
-
-		~suffix_tree_edge()
-		{
-			delete end_node;
 		}
 	};
 
@@ -271,6 +262,9 @@ private:
 	size_t delimiters_count;
 	suffix_tree_suffix active;
 
+	suffix_tree_node * last_node_to_delete;
+	suffix_tree_edge * last_edge_to_delete;
+
 	void add_prefix(suffix_tree_suffix * active, int end_index)
 	{
 		suffix_tree_node * last_parent_node = NULL;
@@ -303,6 +297,7 @@ private:
 			}
 
 			suffix_tree_edge * new_edge = new suffix_tree_edge(end_index, INF, parent_node);
+			update_last_edge(new_edge);
 			new_edge->insert();
 			update_suffix_link(last_parent_node, parent_node);
 			last_parent_node = parent_node;
@@ -337,11 +332,34 @@ private:
 		add_character(delimiter);
 	}
 
+	void delete_nodes()
+	{
+		while(last_node_to_delete != NULL)
+		{
+			suffix_tree_node * temp = last_node_to_delete->next_to_delete;
+			delete last_node_to_delete;
+			last_node_to_delete = temp;
+		}
+	}
+
+	void delete_edges()
+	{
+		while(last_edge_to_delete != NULL)
+		{
+			suffix_tree_edge * temp = last_edge_to_delete->next_to_delete;
+			delete last_edge_to_delete;
+			last_edge_to_delete = temp;
+		}
+	}
+
 public:
 	suffix_tree() :
 		root(new suffix_tree_node(NULL, this)),
-		active(root, 0, -1)
+		active(root, 0, -1),
+		last_node_to_delete(NULL),
+		last_edge_to_delete(NULL)
 	{
+		update_last_node(root);
 	}
 
 	void add_string(const std::string & string)
@@ -364,6 +382,18 @@ public:
 		return text[index];
 	}
 
+	void update_last_node(suffix_tree_node * new_last)
+	{
+		new_last->next_to_delete = last_node_to_delete;
+		last_node_to_delete = new_last;
+	}
+
+	void update_last_edge(suffix_tree_edge * new_last)
+	{
+		new_last->next_to_delete = last_edge_to_delete;
+		last_edge_to_delete = new_last;
+	}
+
 	std::string get_lcs(size_t string1_length, size_t string2_length)
 	{
 		search_result result = root->find_delimiters(string1_length, string1_length + string2_length + 1, 0);
@@ -379,13 +409,14 @@ public:
 
 	~suffix_tree()
 	{
-		delete root;
+		delete_nodes();
+		delete_edges();
 	}
 };
 
 void input(size_t & length, std::string & string1, std::string & string2)
 {
-	//freopen("C:\\temp\\input.txt", "r", stdin);
+	freopen("C:\\temp\\input.txt", "r", stdin);
 	std::cin >> length;
 	std::cin >> string1;
 	std::cin >> string2;
