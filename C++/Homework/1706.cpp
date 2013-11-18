@@ -11,13 +11,10 @@ private:
 	std::string string;
 	std::vector<int> suffixes;
 	std::vector<int> order;
-	std::vector<int> lcp;
+	std::vector<long> lcp;
 
-public:
-	suffix_array(const std::string & word)
+	void init()
 	{
-		string = word;
-		length = string.length();
 		std::vector<int> classes(length);
 		suffixes.resize(length);
 		order.resize(length);
@@ -30,7 +27,7 @@ public:
 
 		for (size_t gramm_length = 1;; gramm_length *= 2)
 		{
-			auto comparator = [=] (size_t first, size_t second) -> bool
+			auto gramm_comparator = [=] (size_t first, size_t second) -> bool
 			{
 				if (order[first] != order[second])
 				return order[first] < order[second];
@@ -39,11 +36,11 @@ public:
 				return (first < length && second < length) ? order[first] < order[second] : first > second;
 			};
 
-			std::sort(suffixes.begin(), suffixes.end(), comparator);
+			std::sort(suffixes.begin(), suffixes.end(), gramm_comparator);
 
 			for(size_t index = 0; index < length-1; ++index)
 			{
-				classes[index + 1] = classes[index] + comparator(suffixes[index], suffixes[index + 1]);
+				classes[index + 1] = classes[index] + gramm_comparator(suffixes[index], suffixes[index + 1]);
 			}
 
 			for(size_t index = 0; index < length; ++index)
@@ -56,6 +53,14 @@ public:
 				break;
 			}
 		}
+	}
+
+public:
+	suffix_array(const std::string & word)
+	{
+		string = word;
+		length = string.length();
+		init();
 	}
 
 	void calc_lcp()
@@ -80,25 +85,26 @@ public:
 		}
 	}
 
-	int count_unique_substr()
+	long long count_unique_substr()
 	{
 		calc_lcp();
-		size_t sum_lcp = std::accumulate(lcp.begin(), lcp.end(), 0);
-		return length * (length + 1) / 2 - sum_lcp;
+		long long sum_lcp = std::accumulate(lcp.begin(), lcp.end(), 0);
+		long long long_length = length;
+		return long_length / 2L * (long_length + 1L)  - sum_lcp;
 	}
 };
 
 
-void input(size_t & k, std::string & word)
+void input(std::istream & in, size_t & k, std::string & word)
 {
 #ifndef ONLINE_JUDGE
 	freopen("C:\\temp\\input.txt", "r", stdin);
 #endif
-	std::cin >> k;
-	std::cin >> word;
+	in >> k;
+	in >> word;
 }
 
-std::string get_substring(const std::string & word, size_t count, size_t index)
+std::string shift_string(const std::string & word, size_t count, size_t index)
 {
 	size_t tail_length = word.length() - index;
 	if (tail_length >= count)
@@ -113,18 +119,18 @@ std::string get_substring(const std::string & word, size_t count, size_t index)
 	}
 }
 
-void solve(size_t k, const std::string & word, std::vector<int> & answer)
+void figure_for_every_shift(size_t k, const std::string & word, std::vector<int> & answer)
 {
 	answer.clear();
 	for(size_t index = 0; index < word.length(); ++index)
 	{
-		std::string shifted = get_substring(word, k, index);
+		std::string shifted = shift_string(word, k, index);
 		suffix_array array(shifted);
 		answer.push_back(array.count_unique_substr());
 	}
 }
 
-void output(const std::vector<int> & answer)
+void output(std::ostream & out, std::vector<int> & answer)
 {
 	for(auto it = answer.begin(); it != answer.end(); ++it)
 	{
@@ -138,8 +144,8 @@ int main()
 	size_t k;
 	std::string word;
 	std::vector<int> answer;
-	input(k, word);
-	solve(k, word, answer);
-	output(answer);
+	input(std::cin, k, word);
+	figure_for_every_shift(k, word, answer);
+	output(std::cout, answer);
 	return 0;
 }
