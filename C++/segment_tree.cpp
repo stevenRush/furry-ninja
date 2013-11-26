@@ -140,6 +140,20 @@ class segment_tree
 		return std::make_pair(minimum, minimum_count);
 	}
 
+	void raw_print(int current_node, int left, int right) 
+	{
+		if (left == right)
+		{
+			std::cout << nodes[current_node].sum << " ";
+		}
+		else
+		{
+			int middle = (left + right) / 2;
+			raw_print(2 * current_node, left, middle);
+			raw_print(2 * current_node + 1, middle + 1, right);
+		}
+	}
+
 public:
 	segment_tree(const std::vector<int> & array)
 	{
@@ -167,4 +181,23 @@ public:
 	{
 		return raw_minimum(1, 0, array_size - 1, left_bound, right_bound);
 	}
+
+	void print()
+	{
+		raw_print(1, 0, array_size - 1);
+		std::cout << std::endl;
+	}
 };
+
+int main()
+{
+	std::vector<int> array;
+	for(size_t index = 0; index < 10; ++index)
+	{
+		array.push_back(index);
+	}
+	segment_tree tree(array);
+	
+	tree.print();
+	return 0;
+}
