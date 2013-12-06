@@ -1,6 +1,7 @@
 #include <utility>
 #include <cstdio>
 #include <cstdarg>
+#include <cstdlib>
 #include <sstream>
 #include <algorithm>
 
@@ -102,7 +103,7 @@ void class_t::add_method(method_t * method)
 	auto it = methods.find(method->ID);
 	if (it != methods.end())
 	{
-		raise_error("method redeclaration: %s", method->ID);
+		raise_error("method redeclaration: %s", method->ID.c_str());
 	}
 	method->set_block(class_block);
 	methods.insert(std::make_pair(method->ID, method));
@@ -433,7 +434,7 @@ variant_t invocation_expression_t::eval(code_block_t * block)
 	method_t * method = clazz->get_method(method_id);
 	if (method == NULL)
 	{
-		raise_error("'%s': method not found", method_id);
+		raise_error("'%s': method not found", method_id.c_str());
 	}
 
 	method->set_block(new code_block_t(clazz->get_code_block()));
@@ -655,7 +656,7 @@ void raise_error(const char * format, ...)
 	//char message[256];
 	va_list args;
 	va_start(args, format);
-	vfprintf_s(stderr, format, args);
+	vfprintf(stderr, format, args);
 	fprintf(stderr, "\n");
 	//yyerror(message);
 	va_end(args);
@@ -699,7 +700,7 @@ const char * to_string(variant_t value)
 	switch (value.type)
 	{
 	case vtInt:
-		itoa(value.int_value, result, 10);
+        sprintf(result, "%d", value.int_value);
 		break;
 	case vtBool:
 		strcpy(result, value.bool_value ? "true" : "false");
@@ -723,7 +724,7 @@ method_signature_t * make_signature(int count, ...)
 	std::string var = oss.str();
 	for(size_t index = 0; index < count; ++index)
 	{
-		variable_type type = va_arg(args, variable_type);
+		variable_type type = (variable_type)va_arg(args, int);
 		oss << "arg" << index;
 		argument_t * arg = new argument_t(oss.str(), type);
 		signature->add(arg);

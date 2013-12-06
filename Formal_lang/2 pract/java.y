@@ -1,6 +1,4 @@
 %{
-#pragma once
-
 #include "bisondef.h"
 
 // forward declarations

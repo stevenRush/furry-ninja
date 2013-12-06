@@ -1,8 +1,6 @@
 %option noyywrap
 
 %{
-	#pragma once
-
 	#include "bisondef.h"
 	
 	void yyerror(const char*);
