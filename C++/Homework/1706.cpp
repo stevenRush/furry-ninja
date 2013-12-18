@@ -13,6 +13,13 @@ private:
 	std::vector<int> order;
 	std::vector<long> lcp;
 
+public:
+	suffix_array(const std::string & word)
+	{
+		string = word;
+		length = string.length();
+	}
+
 	void init()
 	{
 		std::vector<int> classes(length);
@@ -55,14 +62,6 @@ private:
 		}
 	}
 
-public:
-	suffix_array(const std::string & word)
-	{
-		string = word;
-		length = string.length();
-		init();
-	}
-
 	void calc_lcp()
 	{
 		lcp.resize(length-1);
@@ -90,7 +89,7 @@ public:
 		calc_lcp();
 		long long sum_lcp = std::accumulate(lcp.begin(), lcp.end(), 0);
 		long long long_length = length;
-		return long_length / 2L * (long_length + 1L)  - sum_lcp;
+		return long_length * (long_length + 1L) / 2L - sum_lcp;
 	}
 };
 
@@ -119,13 +118,14 @@ std::string shift_string(const std::string & word, size_t count, size_t index)
 	}
 }
 
-void figure_for_every_shift(size_t k, const std::string & word, std::vector<int> & answer)
+void calc_unique_substrs_for_every_shift(size_t k, const std::string & word, std::vector<int> & answer)
 {
 	answer.clear();
 	for(size_t index = 0; index < word.length(); ++index)
 	{
 		std::string shifted = shift_string(word, k, index);
 		suffix_array array(shifted);
+		array.init();
 		answer.push_back(array.count_unique_substr());
 	}
 }
@@ -145,7 +145,7 @@ int main()
 	std::string word;
 	std::vector<int> answer;
 	input(std::cin, k, word);
-	figure_for_every_shift(k, word, answer);
+	calc_unique_substrs_for_every_shift(k, word, answer);
 	output(std::cout, answer);
 	return 0;
 }
