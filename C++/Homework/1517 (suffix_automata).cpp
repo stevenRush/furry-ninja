@@ -48,7 +48,7 @@ class suffix_automata
 		new_state.end_pos = states[last].length;
 		states.push_back(new_state);
 
-		int position = set_jumps(last, char_index, new_state_index);
+		int position = set_transitions_for_char(last, char_index, new_state_index);
 
 		if (position == -1)
 		{
@@ -69,7 +69,7 @@ class suffix_automata
 				memcpy(clone.next, states[state_to_split].next, sizeof(int) * alphabet_size);
 				clone.link = states[state_to_split].link;
 
-				replace_jumps(position, char_index, clone_index, state_to_split);
+				change_transitions_for_char(position, char_index, clone_index, state_to_split);
 
 				states[state_to_split].link = clone_index;
 				states[new_state_index].link = clone_index;
@@ -80,7 +80,7 @@ class suffix_automata
 		last = new_state_index;
 	}
 
-	void replace_jumps(int position, int char_index, int jump_index, int old_jump_index)
+	void change_transitions_for_char(int position, int char_index, int jump_index, int old_jump_index)
 	{
 		while(position != -1 && states[position].next[char_index] == old_jump_index)
 		{
@@ -89,7 +89,7 @@ class suffix_automata
 		}
 	}
 
-	int set_jumps(int position, int char_index, int jump_index)
+	int set_transitions_for_char(int position, int char_index, int jump_index)
 	{
 		while(position != -1 && states[position].next[char_index] == -1)
 		{
@@ -99,7 +99,7 @@ class suffix_automata
 		return position;
 	}
 
-	int find_jump(int current_position, int char_index)
+	int find_next_state_for_char(int current_position, int char_index)
 	{
 		while(current_position != -1 && states[current_position].next[char_index] == -1)
 		{
@@ -134,7 +134,7 @@ public:
 			int char_index = string[i] - 'A';
 			if (states[position].next[char_index] == -1)
 			{
-				position = find_jump(position, char_index);
+				position = find_next_state_for_char(position, char_index);
 				if (position == -1) 
 				{
 					position = 0;
@@ -155,33 +155,35 @@ public:
 	}
 };
 
-void input(std::string & string1, std::string & string2)
+void input(std::istream & in, std::string & string1, std::string & string2)
 {
 	size_t length;
-	std::cin >> length;
-	std::cin >> string1;
-	std::cin >> string2;
+	in >> length;
+	in >> string1;
+	in >> string2;
 }
 
-std::string solve(const std::string & string1, const std::string & string2)
+std::string calc_lcs_for(const std::string & string1, const std::string & string2)
 {
 	suffix_automata automata;
 	automata.build(string1);
 	return automata.lcs(string2);
 }
 
-void output(const std::string & string)
+void output(std::ostream & out, const std::string & string)
 {
-	std::cout << string << std::endl;
+	out << string << std::endl;
 }
 
 int main()
 {
-	//freopen("C:\\temp\\input.txt", "r", stdin);
+#ifndef ONLINE_JUDGE
+	freopen("C:\\temp\\input.txt", "r", stdin);
+#endif
 	std::string string1;
 	std::string string2;
-	input(string1, string2);
-	std::string answer = solve(string1, string2);
-	output(answer);
+	input(std::cin, string1, string2);
+	std::string answer = calc_lcs_for(string1, string2);
+	output(std::cout, answer);
 	return 0;
 }
