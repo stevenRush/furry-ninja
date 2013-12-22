@@ -5,24 +5,26 @@
 
 class suffix_automata
 {
-	static const int alphabet_size = 26;
+	static const int ALPHABET_SIZE = 26;
+	static const char ALPHABET_START = 'A';
+	static const int NO_STATE = -1;
 
 	struct suffix_automata_state
 	{
 		int length;
 		int link;
 		int end_pos;
-		int next[alphabet_size];
+		int next[ALPHABET_SIZE];
 
 		suffix_automata_state()
 		{
 			init_jumps();
 			length = 0;
-			link = -1;
-			end_pos = -1;
+			link = NO_STATE;
+			end_pos = NO_STATE;
 		}
 
-		suffix_automata_state(int length, int end_pos, int link = -1)
+		suffix_automata_state(int length, int end_pos, int link = NO_STATE)
 		{
 			init_jumps();
 			this->length = length;
@@ -32,16 +34,45 @@ class suffix_automata
 
 		void init_jumps()
 		{
-			memset(next, -1, sizeof(int) * alphabet_size);
+			memset(next, NO_STATE, sizeof(int) * ALPHABET_SIZE);
 		}
 	};
 
 	int last;
 	std::vector<suffix_automata_state> states;
 
+	void change_transitions_for_char(int position, int char_index, int jump_index, int old_jump_index)
+	{
+		while(position != NO_STATE && states[position].next[char_index] == old_jump_index)
+		{
+			states[position].next[char_index] = jump_index;
+			position = states[position].link;
+		}
+	}
+
+	int set_transitions_for_char(int position, int char_index, int jump_index)
+	{
+		while(position != NO_STATE && states[position].next[char_index] == NO_STATE)
+		{
+			states[position].next[char_index] = jump_index;
+			position = states[position].link;
+		}
+		return position;
+	}
+
+	int find_next_state_for_char(int current_position, int char_index)
+	{
+		while(current_position != NO_STATE && states[current_position].next[char_index] == NO_STATE)
+		{
+			current_position = states[current_position].link;
+		}
+		return current_position;
+	}
+
+public:
 	void extend(char character)
 	{
-		int char_index = character - 'A';
+		int char_index = character - ALPHABET_START;
 		int new_state_index = states.size();
 		suffix_automata_state new_state;
 		new_state.length = states[last].length + 1;
@@ -50,7 +81,7 @@ class suffix_automata
 
 		int position = set_transitions_for_char(last, char_index, new_state_index);
 
-		if (position == -1)
+		if (position == NO_STATE)
 		{
 			states[new_state_index].link = 0;
 		}
@@ -66,55 +97,26 @@ class suffix_automata
 				suffix_automata_state clone;
 				int clone_index = states.size();
 				clone.length = states[position].length + 1;
-				memcpy(clone.next, states[state_to_split].next, sizeof(int) * alphabet_size);
+				memcpy(clone.next, states[state_to_split].next, sizeof(int) * ALPHABET_SIZE);
 				clone.link = states[state_to_split].link;
 
 				change_transitions_for_char(position, char_index, clone_index, state_to_split);
 
 				states[state_to_split].link = clone_index;
 				states[new_state_index].link = clone_index;
-				clone.end_pos = -1;
+				clone.end_pos = NO_STATE;
 				states.push_back(clone);
 			}
 		}
 		last = new_state_index;
 	}
 
-	void change_transitions_for_char(int position, int char_index, int jump_index, int old_jump_index)
-	{
-		while(position != -1 && states[position].next[char_index] == old_jump_index)
-		{
-			states[position].next[char_index] = jump_index;
-			position = states[position].link;
-		}
-	}
-
-	int set_transitions_for_char(int position, int char_index, int jump_index)
-	{
-		while(position != -1 && states[position].next[char_index] == -1)
-		{
-			states[position].next[char_index] = jump_index;
-			position = states[position].link;
-		}
-		return position;
-	}
-
-	int find_next_state_for_char(int current_position, int char_index)
-	{
-		while(current_position != -1 && states[current_position].next[char_index] == -1)
-		{
-			current_position = states[current_position].link;
-		}
-		return current_position;
-	}
-
-public:
 	void build(const std::string & string)
 	{
 		int n = string.length();
 		suffix_automata_state root_state;
-		root_state.link = -1;
-		root_state.end_pos = -1;
+		root_state.link = NO_STATE;
+		root_state.end_pos = NO_STATE;
 		states.push_back(root_state);
 		last = 0;
 		for(auto it = string.begin(); it != string.end(); ++it)
@@ -128,14 +130,14 @@ public:
 		int position = 0;
 		int current_length = 0;
 		int lcs_length = 0;
-		int lcs_end_index = -1;
+		int lcs_end_index = NO_STATE;
 		for(int i=0; i < string.length(); ++i)
 		{
-			int char_index = string[i] - 'A';
-			if (states[position].next[char_index] == -1)
+			int char_index = string[i] - ALPHABET_START;
+			if (states[position].next[char_index] == NO_STATE)
 			{
 				position = find_next_state_for_char(position, char_index);
-				if (position == -1) 
+				if (position == NO_STATE) 
 				{
 					position = 0;
 					current_length = 0;

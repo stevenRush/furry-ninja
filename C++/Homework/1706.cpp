@@ -11,7 +11,7 @@ private:
 	std::string string;
 	std::vector<int> suffixes;
 	std::vector<int> order;
-	std::vector<long> lcp;
+	std::vector<long long> lcp;
 
 public:
 	suffix_array(const std::string & word)
@@ -22,6 +22,11 @@ public:
 
 	void init()
 	{
+		if (length == 0)
+		{
+			return;	// nothing to do here
+		}
+
 		std::vector<int> classes(length);
 		suffixes.resize(length);
 		order.resize(length);
@@ -64,6 +69,11 @@ public:
 
 	void calc_lcp()
 	{
+		if (length == 0)
+		{
+			return; 
+		}
+
 		lcp.resize(length-1);
 		lcp.assign(length-1, 0);
 		size_t prefix_length = 0;
@@ -87,7 +97,7 @@ public:
 	long long count_unique_substr()
 	{
 		calc_lcp();
-		long long sum_lcp = std::accumulate(lcp.begin(), lcp.end(), 0);
+		long long sum_lcp = std::accumulate(lcp.begin(), lcp.end(), 0LL);
 		long long long_length = length;
 		return long_length * (long_length + 1L) / 2L - sum_lcp;
 	}
